@@ -1,0 +1,35 @@
+version: '3.0'
+# NOTE: 172.x.x.2 should be from compose network 'xdscontainer_default'
+# eg. 'docker network inspect xdscontainer_default' then look for Subnet
+# 172.18.0.2 is the ip of the running fullnode container
+# rpcuser and rpcpassword are your rpc credentials
+# fullnode p2p is 38333
+# fullnode rpc is 48333
+# fullnode api is 48334
+# browse to http://localhost:48334 to see web ui for fullnode
+# https://localhost:8081/  will be the PWA for nodedashboard
+# https://localhost:8080/ will be the CORS proxy to RPC of fullnode
+services:
+  fullnode:
+    build: ./fullnode
+    ports:
+    - "38333:38333"
+    - "48333:48333"
+    - "48334:48334"
+    volumes:
+    - ~/blockcore:/root/.blockcore
+    environment:
+    - apiuri=http://172.18.0.2
+    - rpcuser=RPCUSER
+    - rpcpassword=RPCPSWD
+    - apiport=48334
+    - rpcport=48333
+  dashboard:
+    build: ./nodedashboard
+    ports:
+    - "8080:443"
+    - "8081:444"
+    environment:
+    - TARGET=http://172.18.0.2:48333
+    depends_on:
+      - fullnode

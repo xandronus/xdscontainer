@@ -1,0 +1,1 @@
+dotnet run -c Release -apiuri=$apiuri -apiport=$apiport -server=1 -rpcport=$rpcport -rpcuser=$rpcuser -rpcpassword=$rpcpassword -rpcallowip="172.17.0.0/24" -maxblkmem=1 -maxoutboundconnections=8 -maxinboundconnections=8
