@@ -1,11 +1,25 @@
 version: '3.0'
-# NOTE: 172.x.x.2 should be from compose network 'xdscontainer_default'
+# To install docker-compose on RPI4 (https://dev.to/rohansawant/installing-docker-and-docker-compose-on-the-raspberry-pi-in-5-simple-steps-3mgl/comments)
+#    sudo apt-get -y install libffi-dev libssl-dev python3-dev python3 python3-pip
+#    sudo pip3 -v install docker-compose
+#
+# To work with openvpn you need to precreate the network first:
+# (https://stackoverflow.com/questions/45692255/how-make-openvpn-work-with-docker)
+# basically involves creating a docker network first
+#    docker network create xds-net --subnet 172.18.0.0/24
+#
+# NOTE: 172.18.0.0/24 should be from docker network 'xds-net'
 # eg. 'docker network inspect xdscontainer_default' then look for Subnet
 # 172.18.0.2 is the ip of the running fullnode container
+#
 # rpcuser and rpcpassword are your rpc credentials
 # fullnode p2p is 38333
 # fullnode rpc is 48333
 # fullnode api is 48334
+#
+# To run in background:
+#     docker-compose up -d
+#
 # browse to http://localhost:48334 to see web ui for fullnode
 # https://localhost:8081/  will be the PWA for nodedashboard
 # https://localhost:8080/ will be the CORS proxy to RPC of fullnode
@@ -24,6 +38,8 @@ services:
     - rpcpassword=RPCPSWD
     - apiport=48334
     - rpcport=48333
+    networks:
+    - default   
   dashboard:
     build: ./nodedashboard
     ports:
@@ -31,5 +47,13 @@ services:
     - "8081:444"
     environment:
     - TARGET=http://172.18.0.2:48333
+    networks:
+    - default  
     depends_on:
       - fullnode
+
+networks:
+  default:
+    external:
+      name: xds-net
+      
